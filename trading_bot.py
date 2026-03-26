@@ -175,6 +175,8 @@ class TradingBot:
                     "fapiPrivate": f"{testnet_base}/fapi/v1",
                     "fapiPublicV2": f"{testnet_base}/fapi/v2",
                     "fapiPrivateV2": f"{testnet_base}/fapi/v2",
+                    "fapiPublicV3": f"{testnet_base}/fapi/v3",
+                    "fapiPrivateV3": f"{testnet_base}/fapi/v3",
                     "public": f"{testnet_base}/fapi/v1",
                     "private": f"{testnet_base}/fapi/v1",
                 }
