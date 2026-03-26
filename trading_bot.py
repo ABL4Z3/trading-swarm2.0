@@ -162,16 +162,31 @@ class TradingBot:
 
                 self.log.info("[Exchange] Setting up DEMO trading mode for futures...")
 
-                # Override URLs to point to demo/testnet endpoints
-                # binanceusdm uses 'fapiPublic' and 'fapiPrivate' for futures endpoints
-                exchange.urls["api"] = "https://testnet.binancefuture.com/fapi/v1"
-                exchange.urls["test"] = "https://testnet.binancefuture.com/fapi/v1"
+                # CRITICAL: Override ALL URL endpoints BEFORE load_markets()
+                # binanceusdm uses these specific endpoints:
+                testnet_base = "https://testnet.binancefuture.com"
+
+                # Store original URLs for reference
+                original_api = exchange.urls.get("api", {})
+
+                # Override with testnet URLs - must include all endpoint types
+                exchange.urls["api"] = {
+                    "fapiPublic": f"{testnet_base}/fapi/v1",
+                    "fapiPrivate": f"{testnet_base}/fapi/v1",
+                    "fapiPublicV2": f"{testnet_base}/fapi/v2",
+                    "fapiPrivateV2": f"{testnet_base}/fapi/v2",
+                    "public": f"{testnet_base}/fapi/v1",
+                    "private": f"{testnet_base}/fapi/v1",
+                }
+
+                # Also set test URLs
+                exchange.urls["test"] = exchange.urls["api"].copy()
 
                 # Mark as demo/test environment
                 exchange.options["test"] = True
 
                 self.log.info("[Exchange] Demo mode configured with testnet URLs")
-                self.log.info("[Exchange] Using: https://testnet.binancefuture.com")
+                self.log.info(f"[Exchange] Using: {testnet_base}")
 
             # Load markets (safe now - only futures markets, no sapi calls)
             self.log.info("[Exchange] Loading futures markets...")
