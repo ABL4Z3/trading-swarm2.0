@@ -1,0 +1,93 @@
+# Trading Swarm 2.0 (Railway Ready)
+
+Production-oriented crypto trading bot built around the FALCON v1 strategy, with risk controls, structured trade logging, and optional Telegram alerts.
+
+## What This Repo Includes
+
+- `trading_bot.py`: Main live bot loop (Binance futures testnet/live via config)
+- `falcon_strategy.py`: FALCON v1 signal logic
+- `position_manager.py`: Position lifecycle + exit management (SL/TP/EMA reversal)
+- `trade_logger.py`: SQLite trade/event logging
+- `alerts.py`: Telegram notifications (optional)
+- `config.py`: Environment-driven runtime config
+- `Procfile`, `railway.json`, `runtime.txt`: Railway deployment config
+
+## Strategy Snapshot
+
+FALCON v1 uses multi-layer confluence:
+
+1. EMA200 trend filter
+2. EMA 8/21 crossover timing
+3. MACD momentum confirmation
+4. RSI range filter
+5. Volume spike confirmation
+
+Exit/risk logic is handled with:
+
+- ATR-based stop loss and take profit
+- EMA reversal early-exit checks
+- Circuit-breaker style limits from env config
+
+## Quick Start (Local)
+
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux/macOS
+# source .venv/bin/activate
+
+pip install -r requirements.txt
+python trading_bot.py
+```
+
+## Environment Variables
+
+Create a local `.env` file (do not commit it) and set at least:
+
+```env
+TRADING_MODE=testnet
+
+BINANCE_TESTNET_API_KEY=...
+BINANCE_TESTNET_SECRET=...
+
+# Only for live mode
+BINANCE_LIVE_API_KEY=
+BINANCE_LIVE_SECRET=
+
+MAX_DAILY_LOSS_PCT=5.0
+MAX_DRAWDOWN_PCT=20.0
+MAX_CONSECUTIVE_LOSSES=5
+DEFAULT_RISK_PER_TRADE=0.01
+ENABLE_CIRCUIT_BREAKERS=true
+VOLATILITY_BRAKE_MULTIPLIER=2.0
+
+# Optional
+CRYPTOPANIC_API_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+```
+
+## Deploy on Railway
+
+1. Push this repo to GitHub.
+2. In Railway, create a new project from the GitHub repo.
+3. Railway uses:
+   - `Procfile`: `worker: python trading_bot.py`
+   - `runtime.txt`: Python 3.11
+   - `railway.json`: deploy settings
+4. Add all required env vars in Railway Variables.
+5. Deploy and monitor logs in Railway dashboard.
+
+Detailed deploy notes: see `RAILWAY_DEPLOY.md` and `DEPLOY_RAILWAY.txt`.
+
+## Safety Notes
+
+- Start with `TRADING_MODE=testnet`.
+- Validate behavior for at least 1-2 weeks before live trading.
+- Begin live mode with small risk and capital.
+- Never commit `.env` or API credentials.
+
+## Disclaimer
+
+This software is for educational and research purposes. Trading involves risk and can result in loss of capital. Past backtest results do not guarantee future performance.
