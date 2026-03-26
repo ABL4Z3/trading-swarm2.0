@@ -28,6 +28,16 @@ Exit/risk logic is handled with:
 - EMA reversal early-exit checks
 - Circuit-breaker style limits from env config
 
+## Requirements Files
+
+This project uses **two separate requirements files**:
+
+- **`requirements.txt`** - Full development dependencies including ML libraries, backtesting tools, and experimental features. Use this for local development and testing.
+  
+- **`requirements-railway.txt`** - Minimal production dependencies (~150MB) for Railway deployment. Removes heavy ML/CUDA packages to prevent build timeouts (reduces from 3-4GB to ~150MB, build time from 5+ min to <1 min).
+
+The trading bot gracefully handles missing optional packages (RL risk model, news sentiment) and works perfectly with the minimal Railway requirements.
+
 ## Quick Start (Local)
 
 ```bash
@@ -72,12 +82,14 @@ TELEGRAM_CHAT_ID=
 
 1. Push this repo to GitHub.
 2. In Railway, create a new project from the GitHub repo.
-3. Railway uses:
+3. Railway automatically uses:
    - `Procfile`: `worker: python trading_bot.py`
    - `runtime.txt`: Python 3.11
-   - `railway.json`: deploy settings
-4. Add all required env vars in Railway Variables.
+   - `railway.json`: Build config (uses `requirements-railway.txt`)
+4. Add all required env vars in Railway Variables (see Environment Variables section).
 5. Deploy and monitor logs in Railway dashboard.
+
+**Note**: Railway uses the minimal `requirements-railway.txt` file to keep build times fast (<1 min) and prevent timeouts. The bot includes all necessary trading functionality with these minimal dependencies.
 
 Detailed deploy notes: see `RAILWAY_DEPLOY.md` and `DEPLOY_RAILWAY.txt`.
 

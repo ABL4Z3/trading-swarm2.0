@@ -1,0 +1,41 @@
+# ==========================================
+#  RAILWAY PRODUCTION REQUIREMENTS (MINIMAL)
+# ==========================================
+# This file contains ONLY the essential dependencies needed
+# to run the FALCON v1 trading bot on Railway.
+# 
+# Heavy ML/CUDA packages removed to prevent build timeouts.
+# Estimated size: ~150MB | Build time: 30-60 seconds
+#
+# For full development dependencies (backtesting, ML experiments),
+# use requirements.txt instead.
+# ==========================================
+
+# Core Trading Dependencies
+ccxt>=4.0.0                    # Binance API & exchange connectivity
+pandas>=2.0.0                  # Data manipulation
+numpy>=1.24.0                  # Mathematical operations
+python-dotenv>=1.0.0           # Environment variable loading
+
+# HTTP & API Communication
+requests>=2.31.0               # HTTP requests
+aiohttp>=3.9.0                 # Async HTTP (required by ccxt)
+
+# Telegram Alerts (optional but lightweight ~10MB)
+python-telegram-bot>=20.0      # Trade notifications
+
+# Database (for trade logging)
+sqlalchemy>=2.0.0              # SQLite ORM
+
+# Terminal Output (tiny package)
+colorama>=0.4.6                # Colored logging output
+
+# ==========================================
+# REMOVED FROM RAILWAY BUILD (still in requirements.txt for local dev):
+# - stable-baselines3, torch, gymnasium (RL agent - 2GB+)
+# - langchain, langchain-ollama, langchain-community (News sentiment - 1GB+)
+# - backtrader (backtesting only)
+# - ta (not needed - indicators implemented manually)
+#
+# The bot gracefully handles missing optional packages.
+# ==========================================
