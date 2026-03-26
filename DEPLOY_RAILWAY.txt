@@ -1,0 +1,71 @@
+# Railway Deployment - Quick Start
+
+## 3-Step Deploy (10 Minutes)
+
+### Step 1: Push to GitHub
+```bash
+cd C:\Users\Lenovo\Desktop\trading
+git init
+git add .
+git commit -m "Deploy FALCON trading bot"
+git remote add origin https://github.com/YOUR_USERNAME/falcon-trading-bot.git
+git push -u origin main
+```
+
+### Step 2: Deploy on Railway
+1. Go to https://railway.app
+2. "Start New Project" → "Deploy from GitHub"
+3. Select `falcon-trading-bot` repo
+4. Wait for build (~2 minutes)
+
+### Step 3: Add Environment Variables
+In Railway dashboard → Variables tab, add:
+```
+BINANCE_TESTNET_API_KEY=tZ8xOTZSpeVhJPGqj1SE292l8gSC2E8bqbTjWfho55mBH08r5horifHkN51VzCoE
+BINANCE_TESTNET_SECRET=w2Oq0ESyEpIoSp7izYfOLKPT82eYn2fncvwSwPd6sAF6WLZjJy3UcvGz8mpt2p83
+TRADING_MODE=testnet
+MAX_DAILY_LOSS_PCT=5.0
+DEFAULT_RISK_PER_TRADE=0.01
+ENABLE_CIRCUIT_BREAKERS=true
+```
+
+Click "Restart" and check logs!
+
+## Files Created for Railway
+
+✅ `Procfile` - Tells Railway to run `trading_bot.py`
+✅ `railway.json` - Railway configuration
+✅ `runtime.txt` - Python 3.11 specification
+✅ `requirements.txt` - Dependencies (already exists)
+✅ `.gitignore` - Protects your API keys
+
+## What You Get
+
+- **$5/month free tier**
+- **Auto-restart** on crashes
+- **Auto-deploy** from GitHub
+- **Web dashboard** with logs
+- **10 minute setup** vs 30 min VPS
+
+## Cost
+
+- Free tier: $5 credit/month (covers testing)
+- After: ~$3-8/month
+- **Total: FREE for first month!**
+
+## Monitor
+
+Railway Dashboard → Logs tab
+You should see:
+```
+FALCON Trading Bot v1.0
+Mode: TESTNET
+Connected to Binance Testnet
+Monitoring for signals...
+```
+
+## Done! 🚀
+
+Your bot is running 24/7 in the cloud.
+
+Full guide: See `RAILWAY_DEPLOY.md`
