@@ -31,6 +31,10 @@ class TradingConfig:
     telegram_bot_token: Optional[str]
     telegram_chat_id: Optional[str]
 
+    # Proxy Settings (for geo-restricted regions)
+    http_proxy: Optional[str]
+    https_proxy: Optional[str]
+
     # Risk Management
     max_daily_loss_pct: float
     max_drawdown_pct: float
@@ -80,6 +84,9 @@ def load_config() -> TradingConfig:
         # Telegram
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN") or None,
         telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID") or None,
+        # Proxy (for geo-restricted regions like Railway)
+        http_proxy=os.getenv("HTTP_PROXY") or os.getenv("http_proxy") or None,
+        https_proxy=os.getenv("HTTPS_PROXY") or os.getenv("https_proxy") or None,
         # Risk Management
         max_daily_loss_pct=float(os.getenv("MAX_DAILY_LOSS_PCT", "5.0")),
         max_drawdown_pct=float(os.getenv("MAX_DRAWDOWN_PCT", "20.0")),

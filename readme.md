@@ -80,6 +80,15 @@ TELEGRAM_CHAT_ID=
 
 ## Deploy on Railway
 
+**⚠️ Important: Railway Geo-Restriction**
+
+Railway servers may be in a region where Binance blocks access (HTTP 451 error). If deployment fails with "Service unavailable from a restricted location", see **`GEO_RESTRICTION_FIX.md`** for solutions:
+- Use a proxy service (free or paid)
+- Switch to a different exchange (Bybit, OKX)
+- Deploy to a different platform (Heroku, DigitalOcean)
+
+**Deployment Steps:**
+
 1. Push this repo to GitHub.
 2. In Railway, create a new project from the GitHub repo.
 3. Railway automatically uses:
@@ -87,11 +96,12 @@ TELEGRAM_CHAT_ID=
    - `runtime.txt`: Python 3.11
    - `railway.json`: Build config (uses `requirements-railway.txt`)
 4. Add all required env vars in Railway Variables (see Environment Variables section).
-5. Deploy and monitor logs in Railway dashboard.
+5. **(Optional) Add proxy if needed**: `HTTPS_PROXY=http://user:pass@proxy:port`
+6. Deploy and monitor logs in Railway dashboard.
 
 **Note**: Railway uses the minimal `requirements-railway.txt` file to keep build times fast (<1 min) and prevent timeouts. The bot includes all necessary trading functionality with these minimal dependencies.
 
-Detailed deploy notes: see `RAILWAY_DEPLOY.md` and `DEPLOY_RAILWAY.txt`.
+Detailed deploy notes: see `RAILWAY_DEPLOY.md` and `GEO_RESTRICTION_FIX.md`
 
 ## Safety Notes
 

@@ -124,14 +124,28 @@ class TradingBot:
     def _init_exchange(self):
         """Initialize exchange connection with proper configuration."""
         try:
-            exchange = ccxt.binance(
-                {
-                    "apiKey": self.config.binance_api_key,
-                    "secret": self.config.binance_secret,
-                    "enableRateLimit": True,
-                    "options": {"defaultType": "future"},
-                }
-            )
+            exchange_config = {
+                "apiKey": self.config.binance_api_key,
+                "secret": self.config.binance_secret,
+                "enableRateLimit": True,
+                "options": {"defaultType": "future"},
+            }
+
+            # Add proxy settings if configured (for geo-restricted regions)
+            if self.config.http_proxy or self.config.https_proxy:
+                exchange_config["proxies"] = {}
+                if self.config.http_proxy:
+                    exchange_config["proxies"]["http"] = self.config.http_proxy
+                    self.log.info(
+                        f"[Exchange] Using HTTP proxy: {self.config.http_proxy}"
+                    )
+                if self.config.https_proxy:
+                    exchange_config["proxies"]["https"] = self.config.https_proxy
+                    self.log.info(
+                        f"[Exchange] Using HTTPS proxy: {self.config.https_proxy}"
+                    )
+
+            exchange = ccxt.binance(exchange_config)
 
             # Enable testnet if configured
             if self.config.is_testnet:
