@@ -147,25 +147,36 @@ class TradingBot:
 
             exchange = ccxt.binance(exchange_config)
 
-            # Enable testnet if configured
+            # Enable demo/testnet mode if configured
             if self.config.is_testnet:
-                if hasattr(exchange, "set_sandbox_mode"):
-                    exchange.set_sandbox_mode(True)
-                    self.log.info("[Exchange] Sandbox mode enabled (set_sandbox_mode)")
-                elif hasattr(exchange, "enable_demo_trading"):
-                    exchange.enable_demo_trading(True)
-                    self.log.info("[Exchange] Demo mode enabled (enable_demo_trading)")
-                else:
-                    # Manual URL override for testnet
-                    exchange.urls["api"] = {
-                        "public": "https://testnet.binancefuture.com/fapi/v1",
-                        "private": "https://testnet.binancefuture.com/fapi/v1",
-                    }
-                    self.log.info("[Exchange] Testnet URLs configured manually")
+                # Binance deprecated sandbox mode for futures (March 2024)
+                # New approach: Use demo trading mode with manual URL override
+                # Demo API endpoint: https://testnet.binancefuture.com
+
+                self.log.info("[Exchange] Setting up DEMO trading mode for futures...")
+
+                # Override URLs to point to demo/testnet endpoints
+                exchange.urls["api"] = {
+                    "public": "https://testnet.binancefuture.com/fapi/v1",
+                    "private": "https://testnet.binancefuture.com/fapi/v1",
+                }
+                exchange.urls["test"] = {
+                    "public": "https://testnet.binancefuture.com/fapi/v1",
+                    "private": "https://testnet.binancefuture.com/fapi/v1",
+                }
+
+                # Mark as demo/test environment
+                exchange.options["test"] = True
+
+                self.log.info("[Exchange] Demo mode configured with testnet URLs")
+                self.log.info("[Exchange] Using: https://testnet.binancefuture.com")
 
             # Test connection
             balance = exchange.fetch_balance()
             self.log.info("[Exchange] Connection successful")
+            self.log.info(
+                f"[Exchange] Account balance retrieved: {len(balance.get('info', {}))} assets"
+            )
             return exchange
 
         except Exception as e:
