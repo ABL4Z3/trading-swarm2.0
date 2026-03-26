@@ -128,7 +128,11 @@ class TradingBot:
                 "apiKey": self.config.binance_api_key,
                 "secret": self.config.binance_secret,
                 "enableRateLimit": True,
-                "options": {"defaultType": "future"},
+                "options": {
+                    "defaultType": "future",
+                    # Prevent loading spot markets/currencies (sapi endpoints don't exist on testnet)
+                    "fetchCurrencies": False,
+                },
             }
 
             # Add proxy settings if configured (for geo-restricted regions)
@@ -145,7 +149,10 @@ class TradingBot:
                         f"[Exchange] Using HTTPS proxy: {self.config.https_proxy}"
                     )
 
-            exchange = ccxt.binance(exchange_config)
+            # Use binanceusdm specifically for USD-M Futures (USDT-margined)
+            # This prevents CCXT from trying to access spot API (sapi) endpoints
+            self.log.info("[Exchange] Initializing Binance USD-M Futures...")
+            exchange = ccxt.binanceusdm(exchange_config)
 
             # Enable demo/testnet mode if configured
             if self.config.is_testnet:
@@ -156,14 +163,9 @@ class TradingBot:
                 self.log.info("[Exchange] Setting up DEMO trading mode for futures...")
 
                 # Override URLs to point to demo/testnet endpoints
-                exchange.urls["api"] = {
-                    "public": "https://testnet.binancefuture.com/fapi/v1",
-                    "private": "https://testnet.binancefuture.com/fapi/v1",
-                }
-                exchange.urls["test"] = {
-                    "public": "https://testnet.binancefuture.com/fapi/v1",
-                    "private": "https://testnet.binancefuture.com/fapi/v1",
-                }
+                # binanceusdm uses 'fapiPublic' and 'fapiPrivate' for futures endpoints
+                exchange.urls["api"] = "https://testnet.binancefuture.com/fapi/v1"
+                exchange.urls["test"] = "https://testnet.binancefuture.com/fapi/v1"
 
                 # Mark as demo/test environment
                 exchange.options["test"] = True
@@ -171,12 +173,21 @@ class TradingBot:
                 self.log.info("[Exchange] Demo mode configured with testnet URLs")
                 self.log.info("[Exchange] Using: https://testnet.binancefuture.com")
 
+            # Load markets (safe now - only futures markets, no sapi calls)
+            self.log.info("[Exchange] Loading futures markets...")
+            exchange.load_markets()
+            self.log.info(f"[Exchange] Loaded {len(exchange.markets)} futures markets")
+
             # Test connection
             balance = exchange.fetch_balance()
             self.log.info("[Exchange] Connection successful")
-            self.log.info(
-                f"[Exchange] Account balance retrieved: {len(balance.get('info', {}))} assets"
+
+            # Log balance info
+            total_balance = (
+                balance.get("USDT", {}).get("total", 0) if "USDT" in balance else 0
             )
+            self.log.info(f"[Exchange] Account USDT balance: {total_balance}")
+
             return exchange
 
         except Exception as e:
